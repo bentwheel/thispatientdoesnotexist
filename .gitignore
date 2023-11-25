@@ -5,5 +5,7 @@
 thispatientdoesnotexist.Rproj
 .DS_Store
 etc/output
+etc/faces
 etc/output/metadata
 etc/output/csv
+etc/synthea-with-dependencies.jar

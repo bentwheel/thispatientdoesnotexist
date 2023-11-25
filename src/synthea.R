@@ -62,7 +62,7 @@ uspop_2021 <- get_acs(
 uspop_2021_cmd <- uspop_2021 %>% 
   mutate(simulate = as.integer(simulated_individuals_count * pop / sum(pop)),
          cmd = "java",
-         arg1 = " -jar ./synthea-with-dependencies.jar",
+         arg1 = " -jar ./etc/synthea-with-dependencies.jar",
          arg2 = str_c(" -p ", simulate, " \"", # Simulate this number of people
                       state, "\" -a 21-110 ", # Constrain age range from 21-110
                       if_else(state == "Alabama", # new files for first state
