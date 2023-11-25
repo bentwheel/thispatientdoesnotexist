@@ -1,0 +1,9 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+thispatientdoesnotexist.Rproj
+.DS_Store
+etc/output
+etc/output/metadata
+etc/output/csv
