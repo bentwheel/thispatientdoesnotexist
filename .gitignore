@@ -7,6 +7,9 @@ thispatientdoesnotexist.Rproj
 etc/output
 etc/faces
 etc/output/metadata
+etc/ccsr_crosswalks
+etc/ccir_crosswalks
+etc/icd10_freqs
 etc/output/csv
 etc/summary_tables
 etc/synthea-with-dependencies.jar
