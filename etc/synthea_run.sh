@@ -1,51 +1,51 @@
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 757 "Alabama" -a 21-110 --exporter.csv.append_mode=false 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 111 "Alaska" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1073 "Arizona" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 455 "Arkansas" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 5983 "California" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 867 "Colorado" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 546 "Connecticut" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 148 "Delaware" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 103 "District of Columbia" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 3235 "Florida" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1611 "Georgia" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 220 "Hawaii" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 274 "Idaho" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1944 "Illinois" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1023 "Indiana" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 482 "Iowa" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 444 "Kansas" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 681 "Kentucky" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 706 "Louisiana" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 205 "Maine" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 932 "Maryland" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1060 "Massachusetts" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1525 "Michigan" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 859 "Minnesota" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 449 "Mississippi" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 931 "Missouri" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 163 "Montana" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 295 "Nebraska" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 463 "Nevada" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 208 "New Hampshire" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1400 "New Jersey" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 319 "New Mexico" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 3050 "New York" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1572 "North Carolina" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 117 "North Dakota" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1784 "Ohio" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 598 "Oklahoma" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 637 "Oregon" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1966 "Pennsylvania" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 165 "Rhode Island" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 770 "South Carolina" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 133 "South Dakota" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1040 "Tennessee" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 4376 "Texas" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 490 "Utah" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 97 "Vermont" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1301 "Virginia" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1155 "Washington" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 273 "West Virginia" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 890 "Wisconsin" -a 21-110 
-java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 87 "Wyoming" -a 21-110 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1212 "Alabama" --exporter.csv.append_mode=false 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 178 "Alaska" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1717 "Arizona" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 729 "Arkansas" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 9572 "California" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1388 "Colorado" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 874 "Connecticut" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 238 "Delaware" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 165 "District of Columbia" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 5177 "Florida" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 2578 "Georgia" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 352 "Hawaii" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 439 "Idaho" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 3110 "Illinois" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1638 "Indiana" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 771 "Iowa" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 711 "Kansas" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1090 "Kentucky" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1129 "Louisiana" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 329 "Maine" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1491 "Maryland" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1696 "Massachusetts" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 2441 "Michigan" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1375 "Minnesota" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 719 "Mississippi" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1490 "Missouri" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 261 "Montana" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 473 "Nebraska" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 742 "Nevada" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 332 "New Hampshire" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 2240 "New Jersey" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 511 "New Mexico" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 4880 "New York" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 2515 "North Carolina" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 187 "North Dakota" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 2855 "Ohio" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 957 "Oklahoma" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1020 "Oregon" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 3147 "Pennsylvania" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 264 "Rhode Island" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1232 "South Carolina" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 213 "South Dakota" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1664 "Tennessee" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 7002 "Texas" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 784 "Utah" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 155 "Vermont" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 2082 "Virginia" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1848 "Washington" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 436 "West Virginia" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 1424 "Wisconsin" 
+java -jar ./etc/synthea-with-dependencies.jar -c ./etc/synthea.properties -p 139 "Wyoming" 

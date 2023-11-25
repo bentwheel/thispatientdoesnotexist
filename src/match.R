@@ -11,8 +11,11 @@
 # Required libraries
 library(tidyverse)
 library(tidycensus)
-library(MEPS)
 library(MatchIt)
+
+# This one needs specific installation - for that, uncomment the line below.
+# devtools::install_github("e-mitchell/meps_r_pkg/MEPS")
+library(MEPS)
 
 # Download the 2019 - 2021 Full Year Consolidated Data Files
 # https://meps.ahrq.gov/mepsweb/data_stats/download_data_files.jsp
@@ -102,7 +105,7 @@ fyc19_demos <- fyc19 %>%
 full_3yr_fyc <- fyc21_demos %>% 
   union_all(fyc20_demos) %>% 
   union_all(fyc19_demos) %>% 
-  filter(AGELAST >= 21) %>% 
+  filter(AGELAST >= 18) %>% 
   filter(PERWTYYF > 0) %>% 
   filter(DOBYY > 0, DOBMM > 0)
 
@@ -140,7 +143,8 @@ synthea_people_matchdata <- synthea_people %>%
     RACE == "asian" ~ "NON-HISPANIC ASIAN ONLY",
     .default = "NON-HISPANIC OTHER RACE OR MULTIPLE RACE")) %>% 
   select(-RACE, -ETHNICITY) %>% 
-  mutate(MARITAL = if_else(is.na(MARITAL), "S", MARITAL)) 
+  mutate(MARITAL = if_else(is.na(MARITAL), "S", MARITAL)) %>% 
+  filter(AGELAST >= 18)
 
 # Read in Payer Transitions to discover current Health Plan at EOY 2021
 payer_transitions <- read_csv(paste0(synthea_out_path, "payer_transitions.csv"))
@@ -167,7 +171,7 @@ payer_transitions_filter <- payer_transitions %>%
 
 synthea_people_matchdata_payerdeets <- synthea_people_matchdata %>% 
   inner_join(payer_transitions_filter, by=c("Id"="PATIENT")) %>% 
-  mutate(Medicare_Aged = if_else(AGELAST < 65, 
+  mutate(Medicare_Aged = if_else(AGELAST <= 65, 
                                  "<65", "65+")) %>%  # USE <65 for MCare elig 
   mutate(INSURCYY = case_when(
     Medicare_Aged == "<65" & 
@@ -185,11 +189,11 @@ synthea_people_matchdata_payerdeets <- synthea_people_matchdata %>%
     Medicare_Aged == "65+" & 
       (PRIMARY_PAYER == "Medicare" &  # Medicare Adv OR Medigap - we'll use income pct to split
          SECONDARY_PAYER_ORG == "PRIVATE" & 
-         INCOME_PCT > .75) ~ "65+ EDITED MEDICARE AND PRIVATE", #These will be our Medigaps
+         (INCOME_PCT > .7 | INCOME_PCT < .2)) ~ "65+ EDITED MEDICARE AND PRIVATE", 
     Medicare_Aged == "65+" &
       (PRIMARY_PAYER == "Medicare" &
          SECONDARY_PAYER_ORG == "PRIVATE" &
-         INCOME_PCT <= .75) ~ "65+ EDITED MEDICARE ONLY",
+         INCOME_PCT <= .7 & INCOME_PCT >= .2) ~ "65+ EDITED MEDICARE ONLY",
     Medicare_Aged == "65+" ~ "65+ UNINSURED")) %>% 
   select(-PRIMARY_PAYER, -PRIMARY_PAYER_ORG, -SECONDARY_PAYER, 
          -SECONDARY_PAYER_ORG, -Medicare_Aged) %>% 
@@ -326,7 +330,7 @@ matched_data <-
           distance = "glm",
           exact = ~ MARITAL + SEX + RACETHX + REGIONYY + INSURCYY + AGE_GRP_9,
           replace=F,
-          ratio=10)
+          ratio=3)
 
 # Evaluate post-match distribution - this can take a while!
 match_summary <- summary(matched_data)

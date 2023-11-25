@@ -19,7 +19,7 @@
 # Change this value to scale up or down the number of individuals simulated by 
 # Synthea in the United States.  Simulated individuals will be generated
 # in proportion to state population levels.
-simulated_individuals_count <- 50000
+simulated_individuals_count <- 80000
 
 # Required libraries
 library(tidyverse)
@@ -38,7 +38,7 @@ apikey <- rstudioapi::askForSecret(
 
 # This will load the API Key for future USCB Data queries.
 # Change install=F to *not* save the apikey in the .Renviron file.
-census_api_key(apikey, install=T) 
+census_api_key(apikey, install=T)
 
 # Remove previous shell script created by this process, if it exists.
 unlink("./etc/synthea_run.sh")
@@ -64,7 +64,7 @@ uspop_2021_cmd <- uspop_2021 %>%
          cmd = "java",
          arg1 = " -jar ./etc/synthea-with-dependencies.jar",
          arg2 = str_c(" -p ", simulate, " \"", # Simulate this number of people
-                      state, "\" -a 21-110 ", # Constrain age range from 21-110
+                      state, "\" ", 
                       if_else(state == "Alabama", # new files for first state
                               "--exporter.csv.append_mode=false ", 
                               "")), # All subsequent state runs are appended
