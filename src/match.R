@@ -50,7 +50,8 @@ fyc21_demos <- fyc21 %>%
          IPDISYY=IPDIS21,
          HHTOTDYY=HHTOTD21,
          RXTOTYY=RXTOT21) %>% 
-  mutate(MEPS_DATA_YEAR = 2021)
+  mutate(MEPS_DATA_YEAR = 2021) %>% 
+  mutate(DUPERSID = paste0(DUPERSID, MEPS_DATA_YEAR))
 
 fyc20_demos <- fyc20 %>% 
   select(DUPERSID, DUID, PID, FAMID20, MARRY20X, SPOUID20, DOBMM, DOBYY, 
@@ -75,7 +76,8 @@ fyc20_demos <- fyc20 %>%
          IPDISYY=IPDIS20,
          HHTOTDYY=HHTOTD20,
          RXTOTYY=RXTOT20) %>% 
-  mutate(MEPS_DATA_YEAR = 2020)
+  mutate(MEPS_DATA_YEAR = 2020) %>% 
+  mutate(DUPERSID = paste0(DUPERSID, MEPS_DATA_YEAR))
 
 fyc19_demos <- fyc19 %>% 
   select(DUPERSID, DUID, PID, FAMID19, MARRY19X, SPOUID19, DOBMM, DOBYY, 
@@ -100,7 +102,8 @@ fyc19_demos <- fyc19 %>%
          IPDISYY=IPDIS19,
          HHTOTDYY=HHTOTD19,
          RXTOTYY=RXTOT19) %>% 
-  mutate(MEPS_DATA_YEAR = 2019)
+  mutate(MEPS_DATA_YEAR = 2019) %>% 
+  mutate(DUPERSID = paste0(DUPERSID, MEPS_DATA_YEAR))
 
 full_3yr_fyc <- fyc21_demos %>% 
   union_all(fyc20_demos) %>% 
@@ -362,6 +365,3 @@ final_matchup <- matched_synthea %>%
          AGELAST = AGELAST.x,
          SEX = SEX.x,
          RACETHX = RACETHX.x)
-
-
-

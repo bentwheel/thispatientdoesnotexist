@@ -5,9 +5,15 @@
 
 # It's an optional part of the underlying dataset, but part of the website, so it's done separately.
 
-# Match to faces - prepare face data inventory.
-face_attributes <- read_csv("./summary_tables/face_attributes.csv") %>% 
-  filter(age >= 21) #no kids!
+# Faces were obtained from the first 6 downloadable TAR files here:
+# https://archive.org/details/1mFakeFaces
+
+# Then, a facial recognition ML algorithm was processed on all 60k faces to 
+# determine (as best as it could - yeesh!) attributes like gender, age, and race.
+
+# Retrieve facial scan data
+face_attributes <- read_csv("./etc/face_attributes.csv") %>% 
+  filter(age >= 18) #no kids!
 
 # Reinsert actual age from Synthea
 matched_synthea <- matched_synthea %>% 
@@ -116,9 +122,9 @@ final_mapping <- face_images_mapping %>%
          GENDER = SEX.x,
          BIRTHDATE = BIRTHDATE.x,
          MARITAL = MARITAL.x,
-         REGION21,
-         INSURC21,
-         AGELAST,
+         REGIONYY,
+         INSURCYY,
+         AGELAST = AGELAST.x,
          PREFIX,
          FIRST,
          LAST,
@@ -145,4 +151,4 @@ final_mapping <- face_images_mapping %>%
   mutate(PRIMARY_PAYER = if_else(PRIMARY_PAYER == "NO_INSURANCE", "Uninsured", str_to_title(PRIMARY_PAYER)),
          PRIMARY_PAYER_ORG = if_else(PRIMARY_PAYER_ORG == "NO_INSURANCE", "", str_to_title(PRIMARY_PAYER_ORG)))
 
-final_mapping %>% write_csv("./summary_tables/final_mapping.csv")
+final_mapping %>% write_csv("./etc/summary_tables/final_mapping.csv")
