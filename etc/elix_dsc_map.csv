@@ -1,0 +1,33 @@
+Field_Name,Field_DSC_Short,vw_weights
+chf,Congestive heart failure,7
+carit,Cardiac arrhythmias,5
+valv,Valvular disease,-1
+pcd,Pulmonary circulation disorders,4
+pvd,Peripheral vascular disorders,2
+hypunc,"Hypertension, uncomplicated",0
+hypc,"Hypertension, complicated",0
+para,Paralysis,7
+ond,Other neurological disorders,6
+cpd,Chronic pulmonary disease,3
+diabunc,"Diabetes, uncomplicated",0
+diabc,"Diabetes, complicated",0
+hypothy,Hypothyroidism,0
+rf,Renal failure,5
+ld,Liver disease,11
+pud,"Peptic ulcer disease, excluding bleeding",0
+aids,AIDS/HIV,0
+lymph,Lymphoma,9
+metacanc,Metastatic cancer,12
+solidtum,"Solid tumour, without metastasis",4
+rheumd,Rheumatoid arthritis/collaged vascular disease,0
+coag,Coagulopathy,3
+obes,Obesity,-4
+wloss,Weight loss,6
+fed,Electrolyte disorders,5
+blane,Blood loss anaemia,-2
+dane,Deficiency anaemia,-2
+alcohol,Alcohol abuse,0
+drug,Drug abuse,-7
+psycho,Psychoses,0
+depre,Depression,-3
+score,Elixhauser risk score,
