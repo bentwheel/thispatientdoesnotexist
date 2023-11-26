@@ -13,3 +13,5 @@ etc/icd10_freqs
 etc/output/csv
 etc/summary_tables
 etc/synthea-with-dependencies.jar
+www
+

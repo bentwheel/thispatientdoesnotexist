@@ -1,0 +1,383 @@
+---
+title: "This Patient Does Not Exist v0.1"
+output:
+  html_document:
+    theme: lumen
+params:
+  patient_id: NA
+---
+
+```{r setup, include = FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+
+final_mapping <- read_csv("./etc/summary_tables/final_mapping.csv") %>% 
+  filter(Synthea_ID == params$patient_id)
+rr <- 1
+
+# Get data from previous step
+# count <- as.numeric(count(final_mapping)$n)
+
+# Select a random record
+# rr <- ceiling(runif(1, min=0, max=count))
+
+# Form the correct possessive of the patient's name
+possessive_name <- if_else(str_ends(final_mapping$FIRST[rr], "s"), paste0(final_mapping$FIRST[rr], "'"), paste0(final_mapping$FIRST[rr], "'s"))
+
+# Get the patient's objective pronoun
+obj_pronoun <- if_else(final_mapping$GENDER[rr] == "Male", "him", "her")
+pos_pronoun <- if_else(final_mapping$GENDER[rr] == "Male", "his", "her")
+
+
+library(flextable)
+
+set_flextable_defaults(
+  font.size = 8, font.family = "Arial",
+  background.color = "white",
+  font.color = "#333333",
+  table.layout = "autofit",
+  border.color = "gray",
+  padding.top = 3, padding.bottom = 3,
+  padding.left = 4, padding.right = 4,
+  digits = 0,
+  decimal.mark = ".",
+  big.mark = ",",
+  na_str = "")
+
+```
+
+## `r paste(final_mapping$PREFIX[rr], final_mapping$FIRST[rr], final_mapping$LAST[rr])` {.tabset .tabset-fade .tabset-pills}
+
+<table>
+  <tr>
+    <td>
+      <img align="left" width="200" height="200" src="`r paste0("./etc/faces/", final_mapping$filename[rr])`">
+    </td>
+    <td>
+    &nbsp;&nbsp;   &nbsp;&nbsp;   &nbsp;&nbsp;
+    </td>
+    <td>
+      **ID**: `r paste0(final_mapping$Synthea_ID[rr])` <br>
+      **Age**: `r paste0(floor(final_mapping$AGELAST[rr]))` <br>
+      **Gender**: `r paste0(final_mapping$GENDER[rr])` <br>
+      **Race/Ethnicity Group**: `r paste0(final_mapping$RACETHX[rr])` <br>
+      **DOB**: `r paste0(final_mapping$BIRTHDATE[rr])` <br>
+      **Marital Status**: `r paste0(final_mapping$MARITAL_STATUS[rr])`<br>
+      **Location**: `r paste0(final_mapping$CITY[rr], ", ", final_mapping$STATE[rr])` <br>
+      **Health Plan**: `r paste0(final_mapping$PRIMARY_PAYER[rr], " (", final_mapping$PRIMARY_PAYER_ORG[rr], ")")` <br>
+    </td>
+  </tr>
+</table>
+<br>
+<br>
+
+<!-- Insert blurb here about the distribution of age, gender, and race/eth in the US and how this person compares -->
+
+### Medical Conditions
+
+#### `r possessive_name` Known Medical Conditions in 2021
+
+```{r Medical Conditions Table, echo=FALSE, message=FALSE, warning=FALSE}
+
+# Read in diagnosis detail and filter to this patient
+dx_detail_this_patient <- read_csv("./etc/summary_tables/dx_detail.csv") %>% 
+  filter(DUPERSID == final_mapping$MEPS_ID[rr]) %>% 
+  rename(DiagnosisDesc = ICD10_DSC) %>% 
+  select('ICD-10-CM Diagnosis Code' = ICD10CM_Pretty,
+         'Specific Diagnosis' = DiagnosisDesc,
+         'Clinical Diagnosis Category (CCSR)' = CCSR_DSC,
+         'Chronic or Acute Condition? (CCIR)' = CHRONIC_IND,
+         'Age when first diagnosed' = Age_Diag)
+
+count_dx <- as.numeric(count(dx_detail_this_patient)$n)
+
+dx_detail_table <- dx_detail_this_patient %>% 
+  flextable() %>% 
+  bold(part = "header", bold = TRUE) %>% 
+  theme_box() 
+
+table_display_dx <- if_else(count_dx == 0, paste0(final_mapping$FIRST[rr], " did not receive a diagnosis for any medical conditions in 2021."),  paste0(final_mapping$FIRST[rr], " received a diagnosis for ", count_dx, " unique ", if_else(count_dx == 1, "medical condition ", "medical conditions "), "in 2021."))
+
+```
+
+`r table_display_dx`
+
+`r if(count_dx !=0) { dx_detail_table }`
+
+### Prescription Drugs
+
+#### Drugs Taken by `r final_mapping$FIRST[rr]` in 2021
+
+```{r Prescribed Drugs Table, echo=FALSE, message=FALSE, warning=FALSE}
+
+# Read in drugs detail and filter to this patient
+drugs_detail_this_patient <- read_csv("./etc/summary_tables/drugs_detail.csv") %>% 
+  filter(ID == final_mapping$MEPS_ID[rr]) %>% 
+  select(-ID, -MEPS_DATA_YEAR) %>% 
+  relocate(cost_tot, .after=cost_plan) %>% 
+  rename('Drug Name' = RXNAME,
+         'Length of time taking the drug' = yrs_on_rx,
+         'Number of purchases in 2021' = count_unique,
+         'Out-of-pocket cost' = cost_oop,
+         'Cost to drug plan' = cost_plan,
+         'Total cost' = cost_tot) 
+
+drugs_detail_this_patient_sum <- drugs_detail_this_patient %>% 
+  summarize(across(where(is.numeric), ~sum(.x))) %>% 
+  mutate('Drug Name' = "Total",
+         'Length of time taking the drug' = NA_character_) %>% 
+  relocate('Drug Name', .before='Number of purchases in 2021')
+
+count_fills <- as.numeric(count(drugs_detail_this_patient)$n)
+
+drugs_detail_this_patient <- drugs_detail_this_patient %>% 
+  bind_rows(drugs_detail_this_patient_sum)
+
+
+drug_detail_table <- drugs_detail_this_patient %>% 
+  flextable() %>% 
+  bold(part = "header", bold = TRUE) %>% 
+  colformat_int(j = 'Number of purchases in 2021') %>% 
+  colformat_num(j = c('Out-of-pocket cost', 'Cost to drug plan', 'Total cost'), prefix="$", nsmall=2) %>% 
+  theme_box() %>% 
+  hline(i = ~before(`Drug Name`, "Total")) %>% 
+  bold(i = count_fills+1, bold=T)
+
+
+table_display <- if_else(count_fills == 0, paste0(final_mapping$FIRST[rr], " did not take any prescribed drugs in 2021."),  paste0(final_mapping$FIRST[rr], " took ", count_fills, " unique ", if_else(count_fills == 1, "prescribed drug ", "prescribed drugs "), "in 2021."))
+
+```
+
+`r table_display`
+
+`r if(count_fills !=0) { drug_detail_table }`
+
+#### Drug Utilization
+
+<!--(distributional charts - side by side) 
+This patient vs. estimated average for all patients in MEPS -->
+
+The term **utilization** in a healthcare context refers to the act of a patient or health plan member using or consuming healthcare products and services. When referring to a patient or health plan member using or consuming *pharmaceutical* therapies, we refer to this as <a href="./popups/drug_util.html" target="_blank" rel="noopener noreferrer">**drug utilization**</a>. Drug utilization for a population is typically measured by analyzing the variability of the total number of prescription drugs filled across all individuals in the population on a per person, per year basis.
+
+```{r RX Utilization Comparison, echo=FALSE, fig.height=3, fig.width=8, message=FALSE, warning=FALSE}
+
+mean_vals_sub1 <- read_csv("./etc/summary_tables/mean_rx_util_spend_all.csv") %>% 
+  select(mean_util, mean_util_low, mean_util_upp) %>% 
+  mutate(breakout = "...all US residents age 18 and up") %>% 
+  select(breakout, mean_util, mean_util_low, mean_util_upp)
+
+mean_vals_sub2 <- read_csv("./etc/summary_tables/mean_rx_util_spend_byage,gender.csv") %>% 
+    select(SEX_DSC, AGE_GRP_9, mean_util, mean_util_low, mean_util_upp) %>%
+  filter(SEX_DSC == final_mapping$GENDER[rr],
+         AGE_GRP_9 == final_mapping$AGE_GRP_9[rr]) %>% 
+  mutate(breakout = str_wrap(paste0("...all US residents who are the same gender (", final_mapping$GENDER[rr], ") and general age (", final_mapping$AGE_GRP_9[rr], ") as ", final_mapping$FIRST[rr]), 50)) %>% 
+    select(breakout, mean_util, mean_util_low, mean_util_upp)
+
+mean_vals_sub3 <- read_csv("./etc/summary_tables/mean_rx_util_spend_byrace,eth.csv") %>% 
+  select(RACETHX_DSC, AGE_GRP_9, mean_util, mean_util_low, mean_util_upp) %>%
+  filter(RACETHX_DSC == final_mapping$RACETHX[rr],
+         AGE_GRP_9 == final_mapping$AGE_GRP_9[rr]) %>% 
+  mutate(breakout = str_wrap(paste0("...all US residents in the same general age (", 
+                                    final_mapping$AGE_GRP_9[rr], ") and race/ethnicity group (", final_mapping$RACETHX[rr], ") as ", final_mapping$FIRST[rr]), 50)) %>% 
+    select(breakout, mean_util, mean_util_low, mean_util_upp)
+
+this_persons_data <- read_csv("./etc/summary_tables/individual_drug_data.csv") %>% 
+  filter(ID == final_mapping$MEPS_ID[rr])
+
+this_persons_util <- this_persons_data$RXTOTYY
+  
+rx_util_comparison <- mean_vals_sub3 %>% 
+  union_all(mean_vals_sub2) %>% 
+  union_all(mean_vals_sub1) %>% 
+  mutate(breakout = fct_inorder(breakout)) %>% 
+  ggplot(mapping = aes(x = mean_util, y = breakout, fill = breakout)) +
+  geom_bar(stat = "identity", width = 0.4) +
+  geom_errorbar(aes(xmin=mean_util_low, xmax=mean_util_upp), width=.2,
+                position=position_dodge(.9)) +  theme_minimal() +
+  geom_vline(aes(xintercept = this_persons_util, linetype = "This person's drug utilization in 2021"), color= 'red') +
+  scale_linetype_manual(name = "This person's drug utilization in 2021", values = c(2, 1), 
+                     guide = guide_legend(override.aes = list(color = c("red")))) +  
+  scale_x_continuous(labels = scales::comma) +
+  labs(x = "Number of drug purchases",
+       title = str_wrap(paste0(possessive_name, " drug utilization compared to the average drug utilization for..."), 45)) +
+  guides(fill = F) +
+  theme(axis.title.y = element_blank(),
+        legend.title = element_blank())
+  
+
+rx_util_comparison
+
+```
+
+#### Drug Expenditures (out-of-pocket *only*)
+When a patient in the US pays for a prescription at the pharmacy, there are usually at least two payers - the patient's health plan pays a portion of the price, and then the patient pays the remaining portion. This latter payment - what the patient pays - is referred to as an **out-of-pocket** (OOP) expenditure. Out-of-pocket expenditures are usually related to the patient's co-pay as specified by the patient's prescription drug plan (PDP), but can also include money spent by the patient to satisfy a PDP's deductible or other co-insurance requirements. In short, "out-of-pocket" drug spending is the total amount a patient pays out of their own money for drugs that is *not* paid for by their PDP.
+
+```{r RX OOP Spend Comparison, echo=FALSE, fig.height=4, fig.width=8, message=FALSE, warning=FALSE}
+
+mean_vals_sub1 <- read_csv("./etc/summary_tables/mean_rx_util_spend_all.csv") %>%
+  mutate(breakout = "...all US residents age 18 and up") %>% 
+  select(breakout, mean_oop_spend, mean_oop_spend_low, mean_oop_spend_upp) 
+
+mean_vals_sub2 <- read_csv("./etc/summary_tables/mean_rx_util_spend_byage,gender.csv") %>% 
+  filter(SEX_DSC == final_mapping$GENDER[rr],
+         AGE_GRP_9 == final_mapping$AGE_GRP_9[rr]) %>% 
+  mutate(breakout = str_wrap(paste0("...all US residents who are the same gender (", final_mapping$GENDER[rr], ") and general age (", final_mapping$AGE_GRP_9[rr], ") as ", final_mapping$FIRST[rr]), 50)) %>%
+  select(breakout, mean_oop_spend, mean_oop_spend_low, mean_oop_spend_upp)
+
+mean_vals_sub3 <- read_csv("./etc/summary_tables/mean_rx_util_spend_byrace,eth.csv") %>% 
+  filter(RACETHX_DSC == final_mapping$RACETHX[rr],
+         AGE_GRP_9 == final_mapping$AGE_GRP_9[rr]) %>% 
+  mutate(breakout = str_wrap(paste0("...all US residents in the same general age (", 
+                                    final_mapping$AGE_GRP_9[rr], ") and race/ethnicity group (", final_mapping$RACETHX[rr], ") as ", final_mapping$FIRST[rr]), 50)) %>% 
+  select(breakout, mean_oop_spend, mean_oop_spend_low, mean_oop_spend_upp)
+
+this_persons_oop_spend <- this_persons_data$RXSLFYY
+  
+rx_oop_spend_comparison <- mean_vals_sub3 %>% 
+  union_all(mean_vals_sub2) %>% 
+  union_all(mean_vals_sub1) %>% 
+  mutate(breakout = fct_inorder(breakout)) %>% 
+  ggplot(mapping = aes(x = mean_oop_spend, y = breakout, fill = breakout)) +
+  geom_bar(stat = "identity", width = 0.4) +
+  geom_errorbar(aes(xmin=mean_oop_spend_low, xmax=mean_oop_spend_upp), width=.2,
+                position=position_dodge(.9)) +  theme_minimal() +
+  geom_vline(aes(xintercept = this_persons_oop_spend, linetype = "This person's OOP RX spend in 2021"), color= 'red') +
+  scale_linetype_manual(name = "This person's OOP RX spend in 2021", values = c(2, 1), 
+                     guide = guide_legend(override.aes = list(color = c("red")))) +  
+    scale_x_continuous(labels = scales::dollar) +
+  labs(x = "Out-of-pocket drug expenditures",
+       title = str_wrap(paste0(possessive_name, " out-of-pocket drug expenditures compared to the average out-of-pocket drug expenditures for..."), 45)) +
+  guides(fill = F) +
+  theme(axis.title.y = element_blank(),
+        legend.title = element_blank())
+  
+
+rx_oop_spend_comparison
+
+```
+
+#### Drug Expenditures (total spent)
+In many cases, the amount that the patient's PDP pays towards the prescription drug is passed on entirely to the patient's plan sponsor, which is often the patient's employer, trade union, school, or other association providing group benefits. In other cases.
+
+*Coming soon...*
+
+
+#### Where `r final_mapping$FIRST[rr]` got `r pos_pronoun` prescriptions filled
+
+*Coming soon...*
+
+### Mortality & Readmission Risk
+
+#### Elixhauser Comorbidity Index 
+
+In healthcare and clinical analytics settings, many kinds of risk scores are used to measure (and manage) various types of risks that can impact a population. The [Elixhauser Comorbidity Index](https://en.wikipedia.org/wiki/Elixhauser_Comorbidity_Index) is a common risk scoring method used to determine in-hospital mortality risk, 30-day readmission risks, and risks of other adverse healthcare experiences, all based on the diagnosis codes a patient has been assigned (see <a role="tab" data-toggle="tab" href="#medical-conditions" aria-controls="medical-conditions" aria-expanded="false">Medical Conditions</a> tab for a list of this patient's diagnosis codes).
+
+#### `r possessive_name` Elixhauser Comorbidities in 2021
+
+```{r Elixhauser Comorbidities Table, echo=FALSE, message=FALSE, warning=FALSE}
+
+# Read in diagnosis detail and filter to this patient
+elix_detail_this_patient <- read_csv("./etc/summary_tables/elix_detail.csv") %>% 
+  filter(DUPERSID == final_mapping$MEPS_ID[rr]) %>% 
+  filter(Field_Name != "score") %>% 
+  filter(Field_Value != 0) %>% 
+  select(`Elixhauser Comorbidity` = Field_DSC_Short,
+         `Elixhauser Score Contribution` = vw_weights)
+
+elix_detail_summary <- read_csv("./etc/summary_tables/elix_detail.csv") %>% 
+  filter(DUPERSID == final_mapping$MEPS_ID[rr]) %>% 
+  filter(Field_Name == "score") %>% 
+  mutate(Field_DSC_Short = str_wrap("Elixhauser Risk Score (total sum of comorbidity contributions)", 40)) %>% 
+  select(`Elixhauser Comorbidity` = Field_DSC_Short,
+         `Elixhauser Score Contribution` = Field_Value)
+
+elix_detail_combined <- elix_detail_this_patient %>% 
+  union_all(elix_detail_summary)
+  
+count_elix_comorbidities <- as.numeric(count(elix_detail_this_patient)$n)
+
+elix_detail_table <- elix_detail_combined %>% 
+  flextable() %>% 
+  bold(part = "header", bold = TRUE) %>% 
+  theme_box()%>% 
+  hline(i = ~before(`Elixhauser Comorbidity`, str_wrap("Elixhauser Risk Score (total sum of comorbidity contributions)", 40))) %>% 
+  bold(i = count_elix_comorbidities+1, bold=T)
+
+
+table_display_elix <- if_else(count_elix_comorbidities == 0, paste0(final_mapping$FIRST[rr], " did not receive a diagnosis in 2021 that maps to any Elixhauser Comorbidity categories."),  paste0(final_mapping$FIRST[rr], " received a diagnosis in 2021 for ", count_elix_comorbidities, " unique ", if_else(count_elix_comorbidities == 1, "Elixhauser Comorbidity category.", "Elixhauser Comorbidity categories.")))
+
+```
+
+`r table_display_elix`
+
+`r if(count_elix_comorbidities !=0) { elix_detail_table }`
+
+#### Why Elixhauser?
+
+Elixhauser risk scores have been found to be very predictive of in-hospital mortality risk, 30-day all-cause hospital readmission risk, and the amount of days that patients spend in an inpatient facility after being admitted.
+
+
+
+Other risk scores that are frequently used to measure the various risks, conditioned on health status, that can impact members of a population are discussed in the <a role="tab" data-toggle="tab" href="#social-determinants-risk" aria-controls="social-determinants-risk" aria-expanded="true">Social Determinants Risk</a> and <a role="tab" data-toggle="tab" href="#financial-risk" aria-controls="financial-risk" aria-expanded="true">Financial Risk</a> tabs.
+
+
+
+
+### Social Determinants Risk
+
+### Financial Risk
+
+### Disclaimer
+
+#### Patient Data Sources
+
+**This patient profile's resemblance or clinical/medical similarity to actual persons, living or dead, is entirely coincidental.**
+
+##### Overview 
+
+Information about this hypothetical patient is largely based on information surveyed from an actual participant in the 2021 administration of the [Medical Expenditure Panel Survey](https://meps.ahrq.gov/mepsweb/index.jsp). Where individual-level respondent data was suppressed or not available due to privacy concerns, realistic *simulated* data generated by [Synthea](https://synthea.mitre.org/) (an open-source patient generator) was used to fill in the gaps.
+
+##### Medical Expenditure Panel Survey (MEPS) Public Use File(s)
+
+In order to build this dataset of realistic patient experiences and measures, [publicly-available MEPS respondent data from 2021](https://meps.ahrq.gov/mepsweb/data_stats/download_data_files.jsp) was retrieved from the MEPS site for the year 2021. The 2021 MEPS data was collected across [four independent panels](https://meps.ahrq.gov/survey_comp/hc_data_collection.jsp) on over 27,000 individuals in the US. MEPS data includes race/ethnicity, gender, month and year of birth, health plan coverage status, medical conditions, prescription drug utilization, and medical/drug expenditures (total and out-of-pocket). Additionally, for 2021, a new self-administered questionnaire (SAQ) concerning social determinants of health was administered across multiple panels. The 2021 dataset was then filtered down to contain only those respondents who both qualified for and answered this new SAQ, leaving the total count of respondents in this dataset at 16,714.
+
+##### Synthea, an open-source synthetic patient generator
+
+Next, a dataset of 50,000 synthetic patients was generated by Synthea. The 50,000 synthetic patients were generated across all 50 US states (plus DC) proportionally to total population measures for each state as of the 2021 5-year American Community Survey (ACS). The Synthea engine [utilizes relatively recent ACS data at the county level of granularity](https://github.com/synthetichealth/synthea/wiki/Default-Demographic-Data) to ensure that populations generated within each state are representative of race/ethnicity, gender, age, income, education, and other SDoH factors at the county level, within each state. As a result, the final nationwide simulated dataset of 50,000 is representative of these factors at the county level across the entire US.
+
+##### MatchIt, an R package for matching observational cohorts
+
+The matching was done with replacement on a 1-N exact basis on the following attributes:
+
+* Gender
+* Year of birth (a proxy for age)
+* Marital status (a significant predictor of patient experiences and risks)
+* Insurance type (<65 or 65+, Government or Private, or otherwise uninsured)
+* Race & ethnicity
+* Income percentile
+* [Census region](https://www2.census.gov/geo/pdfs/maps-data/maps/reference/us_regdiv.pdf)
+
+The matching process is carried out in such a manner that the 50,000 simulated patients are matched to the most "similar" MEPS respondents on the basis of these factors. As the matching is done with replacement, the same MEPS respondent could be 
+The Synthea dataset is used as the "ground truth" basis of demographic distributions. This is because MEPS purposefully utilizes oversampling methods across certain demographic subpopulations in order to reduce the sample variance of estimates of certain measures for these populations, so the distribution across the MEPS PUF of key demographic factors such as age, race/ethnicity, gender, insurance type, etc. is not necessarily representative of the US population. Sample weights are used to construct assignment probabilities when matching MEPS respondents to Synthea-generated synthetic patients.
+
+Exact matching on this large of a set of factors ensures that the process of "filling in the gaps" with synthetic data is done with as much realism as possible. The matching algorithm is executed using the [R MatchIt package](https://cran.r-project.org/web/packages/MatchIt/vignettes/MatchIt.html), a package used predominantly for performing propensity score matches across members of observational cohorts in order to mitigate [confounding biases](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3503514/) in healthcare and life sciences studies.
+
+#### Patient Likenesses
+The hypothetical patient's face is drawn out of a large collection of AI-generated faces produced by [StyleGAN](https://arxiv.org/abs/1812.04948) that is made available for public use under the [Creative Commons license](./faces_LICENSE.txt) and is largely restricted for use in noncommercial purposes, only.
+
+##### Patient Diagnoses
+Diagnosis information is provided at the respondent level in the MEPS Condition PUFs for each year. The 2021 MEPS Condition File was used for this information. Information about rare diseases that could potentially be used to identify respondents in the MEPS de-identified PUFs is suppressed by MEPS. No effort is made by this process to attempt to guess at suppressed medical conditions.
+
+Additionally, the medical conditions for each respondent are censored in a manner such that only the first three characters of all ICD-10-CM codes associated with each respondent's diagnoses are made available in the MEPS Medical Conditions PUF. This is also done in order to ensure that re-identification of the respondent information is not possible. However, full ICD-10-CM codes are required for use in Elixhauser comorbidity measurement, chronic condition flagging, and CMS-HCC/HHS-HCC risk scoring. In order to reconstruct this information with a level of realism that reflects the diverse diagnosis state of a population, ICD-10-CM code frequency distributions from public datasets made available by the state of California are used to realistically regenerate these codes. In some rare cases, this can cause diagnosis code configurations that are not entirely realistic.
+
+##### Patient Prescription Drugs
+
+##### Financial Risk
+
+##### Mortality/Readmission Risk
+
+##### Social Determinants Risk
+
+#### More Information
+The collection of R and Python scripts that are used to build this site (and which you can freely use to re-create or modify this site and its underlying data for non-commercial purposes) is available on [GitHub](https://github.com/bentwheel/riskscore-meps).
